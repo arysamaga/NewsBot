@@ -1,0 +1,61 @@
+[project]
+name = "newsstream"
+version = "0.1.0"
+description = "Agentic financial news monitor: watches OSINT accounts, classifies materiality for crude oil, surfaces events in seconds"
+default-app = "server"
+
+# `jac run` starts the FastAPI service (app.jac). `jac build web` compiles the
+# browser UI (web/main.jac) into one portable index.html that the service
+# serves at /; the service rebuilds it at startup when it is missing or stale.
+[apps.server]
+kind = "cli"
+entry-point = "main"
+
+[apps.web]
+kind = "web-static"
+entry-point = "web.main"
+
+# `jac run replay -- tests/fixtures/` pushes fixture posts at a running server.
+[apps.replay]
+kind = "cli"
+entry-point = "replay"
+
+# Python packages, used from Jac through plain imports. Pinned to the exact
+# versions the Python edition ran on (its uv.lock), so the port changes the
+# language and not the libraries underneath. Loosen these to upgrade.
+[dependencies.pypi]
+fastapi = "==0.141.1"
+uvicorn = "==0.52.4"
+aiosqlite = "==0.22.1"
+anthropic = "==1.4.0"
+pyyaml = "==6.0.3"
+python-dotenv = "==1.2.3"
+httpx = "==0.28.1"
+websockets = "==17.1"
+telethon = "==1.44.0"
+# Indirect dependencies that would otherwise resolve newer than uv.lock had them.
+httpx2 = "==2.12.0"
+httpcore2 = "==2.12.0"
+idna = "==3.19"
+jiter = "==0.16.0"
+starlette = "==1.6.0"
+
+[dependencies.npm]
+react = "^19.2.0"
+react-dom = "^19.2.0"
+
+[dependencies.npm.dev]
+vite = "^6.4.1"
+"@vitejs/plugin-react" = "^4.7.0"
+
+[client.app_meta_data]
+title = "newsstream"
+
+[test]
+directories = ["tests"]
+
+# Run test blocks one at a time. The cassette-recording run (first run with
+# ANTHROPIC_API_KEY set) rewrites tests/cassettes/llm.json after every call, and
+# parallel workers would overwrite each other's recordings.
+[dev]
+test_jobs = "0"
